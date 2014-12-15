@@ -22,7 +22,7 @@ class SplayTree {
             key(k),
             value(v) { }
     };
-    Node *root_;
+    Node *root_ = nullptr;//be careful
     
 private:
     void splay(Node *n) {
@@ -145,10 +145,18 @@ public:
                 return x -> value;
             }
         }
-        return x -> value;
+        if (x != nullptr) {
+            return x -> value;
+        }
+        else {
+            return 0;
+        }
     }
     
     Node * findMax(Node *n) {
+        if (n == nullptr) {
+            return n;
+        }
         while (n -> right != nullptr) {
             n = n -> right;
         }
@@ -156,6 +164,9 @@ public:
     }
     
     Node * findMin(Node *n) {
+        if (n == nullptr) {
+            return n;
+        }
         while (n -> left != nullptr) {
             n = n -> left;
         }
