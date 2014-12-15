@@ -26,6 +26,9 @@ class SplayTree {
     
 private:
     void splay(Node *n) {
+        if (n == nullptr) {
+            return;
+        }
         while (n -> parent != nullptr && n -> parent -> parent != nullptr) {
             if (n == n -> parent -> left) {
                 if (n -> parent == n -> parent -> parent -> left) {
@@ -57,6 +60,21 @@ private:
         else {
             rotateWithRight(n -> parent);
         }
+    }
+    
+    Node * search(Node *x, int key) {
+        while (x != nullptr) {
+            if (key > x -> key) {
+                x = x -> right;
+            }
+            else if (key < x -> key){
+                x = x -> left;
+            }
+            else {
+                return x;
+            }
+        }
+        return nullptr;
     }
     
     void insert(Node *n) {
@@ -97,10 +115,12 @@ private:
             n -> parent -> right = x;
         }
         x -> parent = n -> parent;
+        
         n -> left = x -> right;
-        if (x -> right != nullptr) {
+        if (n -> left != nullptr) {
             n -> left -> parent = n;
         }
+        
         x -> right = n;
         n -> parent = x;
     }
@@ -117,35 +137,47 @@ private:
             n -> parent -> right = x;
         }
         x -> parent = n -> parent;
+        
         n -> right = x -> left;
-        if (x -> left != nullptr) {
+        if (n -> right != nullptr) {
             n -> right -> parent = n;
         }
+        
         x -> left = n;
         n -> parent = x;
     }
     
 public:
-    void insert(int k, int s) {
-        Node *x = new Node(k, s);
-        insert(x);
+    void insert(int key, int value) {
+        if (root_ == nullptr) {
+            root_ = new Node(key, value);
+            return;
+        }
+        Node *x = root_;
+        Node *px = root_;
+        while (x != nullptr) {
+            px = x;
+            if (key >= x -> key) {
+                x = x -> right;
+            }
+            else {
+                x = x -> left;
+            }
+        }
+        if (key >= px -> key) {
+            px -> right = new Node(key, value);
+            px -> right -> parent = px;
+        }
+        else {
+            px -> left = new Node(key, value);
+            px -> left -> parent = px;
+        }
     }
     
     int get(int key) {
-        Node *x = root_;
-        while (x != nullptr) {
-            if (key > x -> key) {
-                x = x -> right;
-            }
-            else if (key < x -> key) {
-                x = x -> left;
-            }
-            else {
-                splay(x);
-                return x -> value;
-            }
-        }
+        Node *x = search(root_, key);
         if (x != nullptr) {
+            splay(x);
             return x -> value;
         }
         else {
@@ -177,7 +209,13 @@ public:
         if (root_ == nullptr) {
             return;
         }
-        get(key);
+        Node *x = search(root_, key);
+        if (x == nullptr) {
+            return;
+        }
+        else {
+            splay(x);
+        }
         Node *left = root_ -> left;
         if (left != nullptr) {
             left -> parent = nullptr;
